@@ -26,7 +26,7 @@ const Colors = {
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { score, highestScore, resetQuiz } = useQuiz();
+  const { score, highestScore, resetQuiz, questions } = useQuiz();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
 
@@ -57,7 +57,7 @@ export default function ResultsScreen() {
             <View style={styles.scoreRow}>
               <ThemedText style={styles.scoreLabel}>Current Score</ThemedText>
               <ThemedText style={[styles.scoreNumber, { color: colors.tint }]}>
-                {score} / 13
+                {score} / {questions.length}
               </ThemedText>
             </View>
 
@@ -66,27 +66,27 @@ export default function ResultsScreen() {
             <View style={styles.scoreRow}>
               <ThemedText style={styles.scoreLabel}>Highest Score</ThemedText>
               <ThemedText style={[styles.scoreNumber, { color: colors.successColor }]}>
-                {highestScore} / 13
+                {highestScore} / {questions.length}
               </ThemedText>
             </View>
           </View>
 
           <View style={styles.feedbackContainer}>
-            {score === 13 ? (
+            {score === questions.length ? (
               <>
                 <ThemedText style={styles.feedbackTitle}>Perfect Score! 🎉</ThemedText>
                 <ThemedText style={styles.feedbackText}>
                   Excellent! You've mastered all the questions. Keep up your knowledge!
                 </ThemedText>
               </>
-            ) : score >= 10 ? (
+            ) : score >= Math.ceil(questions.length * 0.75) ? (
               <>
                 <ThemedText style={styles.feedbackTitle}>Great Job! 🌟</ThemedText>
                 <ThemedText style={styles.feedbackText}>
                   You've answered most questions correctly. Keep practicing!
                 </ThemedText>
               </>
-            ) : score >= 7 ? (
+            ) : score >= Math.ceil(questions.length * 0.5) ? (
               <>
                 <ThemedText style={styles.feedbackTitle}>Good Effort! 👍</ThemedText>
                 <ThemedText style={styles.feedbackText}>
@@ -110,7 +110,7 @@ export default function ResultsScreen() {
                 <ThemedText>Accuracy</ThemedText>
               </View>
               <ThemedText style={[styles.statValue, { color: colors.tint }]}>
-                {Math.round((score / 13) * 100)}%
+                {Math.round((score / questions.length) * 100)}%
               </ThemedText>
             </View>
             <View style={styles.statBar}>
@@ -118,7 +118,7 @@ export default function ResultsScreen() {
                 <ThemedText>Correct Answers</ThemedText>
               </View>
               <ThemedText style={[styles.statValue, { color: colors.tint }]}>
-                {score} / 13
+                {score} / {questions.length}
               </ThemedText>
             </View>
             <View style={styles.statBar}>
@@ -126,7 +126,7 @@ export default function ResultsScreen() {
                 <ThemedText>Personal Record</ThemedText>
               </View>
               <ThemedText style={[styles.statValue, { color: colors.successColor }]}>
-                {highestScore} / 13
+                {highestScore} / {questions.length}
               </ThemedText>
             </View>
           </View>

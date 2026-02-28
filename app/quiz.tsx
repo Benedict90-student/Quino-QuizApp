@@ -36,10 +36,12 @@ export default function QuizScreen() {
     currentQuestionIndex,
     currentQuestion,
     answers,
+    questions,
     selectAnswer,
     goToNextQuestion,
     goToPreviousQuestion,
     submitQuiz,
+    timeRemaining,
   } = useQuiz();
 
   const colorScheme = useColorScheme();
@@ -47,10 +49,10 @@ export default function QuizScreen() {
 
   useEffect(() => {
     navigation.setOptions({
-      title: `Question ${currentQuestionIndex + 1} of 13`,
+      title: `Question ${currentQuestionIndex + 1} of ${questions.length}`,
       headerShown: true,
     });
-  }, [currentQuestionIndex, navigation]);
+  }, [currentQuestionIndex, navigation, questions.length]);
 
   if (!currentQuestion) {
     return (
@@ -61,7 +63,13 @@ export default function QuizScreen() {
   }
 
   const userAnswer = answers.find(a => a.questionId === currentQuestion.id)?.answer;
-  const isLastQuestion = currentQuestionIndex === 12;
+  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleNextOrSubmit = async () => {
     if (isLastQuestion) {
@@ -131,20 +139,29 @@ export default function QuizScreen() {
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.questionSection}>
-          <View style={styles.progressBar}>
-            <View
-              style={[
-                styles.progressFill,
-                {
-                  width: `${((currentQuestionIndex + 1) / 13) * 100}%`,
-                  backgroundColor: colors.tint,
-                },
-              ]}
-            />
+          <View style={styles.headerRow}>
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBar}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`,
+                      backgroundColor: colors.tint,
+                    },
+                  ]}
+                />
+              </View>
+            </View>
+            <View style={[styles.timerBox, { borderColor: colors.tint }]}>
+              <ThemedText style={[styles.timerText, { color: colors.tint }]}>
+                {formatTime(timeRemaining)}
+              </ThemedText>
+            </View>
           </View>
 
           <ThemedText style={styles.questionNumber}>
-            Question {currentQuestionIndex + 1} of 13
+            Question {currentQuestionIndex + 1} of {questions.length}
           </ThemedText>
 
           <ThemedText style={styles.question}>{currentQuestion.question}</ThemedText>
@@ -205,16 +222,34 @@ const styles = StyleSheet.create({
   questionSection: {
     flex: 1,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 20,
+  },
+  progressBarContainer: {
+    flex: 1,
+  },
   progressBar: {
     height: 6,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     borderRadius: 3,
-    marginBottom: 20,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: 3,
+  },
+  timerBox: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 2,
+    borderRadius: 6,
+  },
+  timerText: {
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   questionNumber: {
     fontSize: 12,
